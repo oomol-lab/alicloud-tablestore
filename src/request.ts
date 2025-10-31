@@ -1,7 +1,7 @@
 import type { ClientConfig, OTSApiName, RequestOptions } from "./type";
 import { createHash, createHmac } from "node:crypto";
 import ky from "ky";
-import { API_VERSION, H_OTS_ACCESS_KEY_ID, H_OTS_API_VERSION, H_OTS_CONTENT_MD5, H_OTS_DATE, H_OTS_INSTANCE_NAME, H_OTS_PREFIX, H_OTS_SIGNATURE, USER_AGENT } from "./const";
+import { API_VERSION, H_OTS_ACCESS_KEY_ID, H_OTS_API_VERSION, H_OTS_CONTENT_MD5, H_OTS_DATE, H_OTS_INSTANCE_NAME, H_OTS_PREFIX, H_OTS_SIGNATURE, H_OTS_STS_TOKEN, USER_AGENT } from "./const";
 
 const DEFAULT_REQUEST_OPTIONS = {
     retry: 2,
@@ -20,6 +20,10 @@ export class Request {
             [H_OTS_DATE]: new Date().toISOString(),
             [H_OTS_INSTANCE_NAME]: this.config.instanceName,
         }, options.headers);
+
+        if (this.config.stsToken) {
+            headers[H_OTS_STS_TOKEN] = this.config.stsToken;
+        }
 
         headers[H_OTS_SIGNATURE] = this.sign(options.apiName, headers);
         headers["User-Agent"] = USER_AGENT;

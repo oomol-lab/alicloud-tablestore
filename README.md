@@ -21,6 +21,7 @@ const client = new Client({
   endpoint: "your-instance.cn-hangzhou.ots.aliyuncs.com",
   accessKeyID: "YOUR_ACCESS_KEY_ID",
   accessKeySecret: "YOUR_ACCESS_KEY_SECRET",
+  stsToken: "YOUR_STS_TOKEN", // optional
   instanceName: "your-instance",
 });
 

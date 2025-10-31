@@ -4,6 +4,7 @@ export interface ClientConfig {
     endpoint: string;
     accessKeyID: string;
     accessKeySecret: string;
+    stsToken?: string;
     instanceName: string;
 }
 

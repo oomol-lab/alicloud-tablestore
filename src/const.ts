@@ -9,6 +9,7 @@ export const H_OTS_API_VERSION = "x-ots-apiversion";
 export const H_OTS_CONTENT_MD5 = "x-ots-contentmd5";
 export const H_OTS_DATE = "x-ots-date";
 export const H_OTS_INSTANCE_NAME = "x-ots-instancename";
+export const H_OTS_STS_TOKEN = "x-ots-ststoken";
 export const H_OTS_SIGNATURE = "x-ots-signature";
 
 // OTS API Name
