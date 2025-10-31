@@ -1,0 +1,53 @@
+{
+  "name": "alicloud-tablestore",
+  "type": "module",
+  "version": "0.1.0",
+  "author": "Kevin Cui <bh@bugs.cc>",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./const": {
+      "types": "./dist/const.d.mts",
+      "import": "./dist/const.mjs"
+    },
+    "./request": {
+      "types": "./dist/request.d.mts",
+      "import": "./dist/request.mjs"
+    },
+    "./pb/*": {
+      "types": "./dist/pb/*.d.mts",
+      "import": "./dist/pb/*.mjs"
+    },
+    "./builder/*": {
+      "types": "./dist/builder/*.d.mts",
+      "import": "./dist/builder/*.mjs"
+    },
+    "./operator/*": {
+      "types": "./dist/operator/*.d.mts",
+      "import": "./dist/operator/*.mjs"
+    }
+  },
+  "module": "src/index.ts",
+  "scripts": {
+    "build": "tsdown",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "ts:check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "ky": "^1.13.0",
+    "protobufjs": "^7.5.4"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^6.1.0",
+    "@types/bun": "latest",
+    "eslint-plugin-format": "^1.0.2",
+    "tsdown": "^0.15.12"
+  }
+}
