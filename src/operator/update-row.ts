@@ -1,6 +1,6 @@
+import type { Client } from "../client";
 import type { Condition, ConsumedCapacity, ReturnContent } from "../pb/type";
 import type { PlainBufferCell, PlainBufferRow } from "../plainbuffer";
-import type { OperatorConfig } from "../type";
 import { Buffer } from "node:buffer";
 import { buildFilter } from "../builder/filter";
 import { OTS_API_NAME } from "../const";
@@ -8,7 +8,6 @@ import { builder } from "../pb/builder";
 import { RowExistenceExpectation } from "../pb/type";
 import { CellOp, decodePlainBuffer, encodePlainBuffer } from "../plainbuffer";
 import { fixPlainBufferCellType } from "../utils";
-import { Basic } from "./basic";
 
 export const ProtoUpdateRowRequest = builder.lookupType("ots.UpdateRowRequest");
 export const ProtoUpdateRowResponse = builder.lookupType("ots.UpdateRowResponse");
@@ -33,9 +32,8 @@ export interface UpdateRowResponse {
     row: Array<PlainBufferRow> | null;
 }
 
-export class UpdateRow extends Basic {
-    public constructor(config: OperatorConfig) {
-        super(config);
+export class UpdateRow {
+    public constructor(private readonly client: Client) {
     }
 
     public static async builder(options: UpdateRowData) {
@@ -69,7 +67,7 @@ export class UpdateRow extends Basic {
 
     public async do(data: UpdateRowData) {
         const body = await UpdateRow.builder(data);
-        return await this.request.do({
+        return await this.client.request.do({
             apiName: OTS_API_NAME.UpdateRow,
             body,
         });

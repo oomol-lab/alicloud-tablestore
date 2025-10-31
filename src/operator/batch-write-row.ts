@@ -1,6 +1,6 @@
+import type { Client } from "../client";
 import type { Condition, ConsumedCapacity, Error, ReturnContent } from "../pb/type";
 import type { PlainBufferCell, PlainBufferRow } from "../plainbuffer";
-import type { OperatorConfig } from "../type";
 import type { UpdateRowAttributeColumns } from "./update-row";
 import { Buffer } from "node:buffer";
 import { buildFilter } from "../builder/filter";
@@ -9,7 +9,6 @@ import { builder } from "../pb/builder";
 import { OperationType, RowExistenceExpectation } from "../pb/type";
 import { decodePlainBuffer, encodePlainBuffer } from "../plainbuffer";
 import { fixPlainBufferCellType } from "../utils";
-import { Basic } from "./basic";
 import { UpdateRow } from "./update-row";
 
 export const ProtoBatchWriteRowRequest = builder.lookupType("ots.BatchWriteRowRequest");
@@ -62,9 +61,8 @@ export interface BatchWriteRowResponse {
     tables: Array<TableInBatchWriteRowResponse>;
 }
 
-export class BatchWriteRow extends Basic {
-    public constructor(config: OperatorConfig) {
-        super(config);
+export class BatchWriteRow {
+    public constructor(private readonly client: Client) {
     }
 
     public static async builder(options: BatchWriteRowData) {
@@ -111,7 +109,7 @@ export class BatchWriteRow extends Basic {
 
     public async do(data: BatchWriteRowData) {
         const body = await BatchWriteRow.builder(data);
-        return await this.request.do({
+        return await this.client.request.do({
             apiName: OTS_API_NAME.BatchWriteRow,
             body,
         });

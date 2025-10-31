@@ -1,13 +1,12 @@
+import type { Client } from "../client";
 import type { ConsumedCapacity, Error, Filter, TimeRange } from "../pb/type";
 import type { PlainBufferCell, PlainBufferRow } from "../plainbuffer";
-import type { OperatorConfig } from "../type";
 import { Buffer } from "node:buffer";
 import { buildFilter } from "../builder/filter";
 import { OTS_API_NAME } from "../const";
 import { builder } from "../pb/builder";
 import { decodePlainBuffer, encodePlainBuffer } from "../plainbuffer";
 import { fixPlainBufferCellType } from "../utils";
-import { Basic } from "./basic";
 
 export const ProtoBatchGetRowRequest = builder.lookupType("ots.BatchGetRowRequest");
 export const ProtoBatchGetRowResponse = builder.lookupType("ots.BatchGetRowResponse");
@@ -45,9 +44,8 @@ export interface BatchGetRowResponse {
     tables: Array<TableInBatchGetRowResponse>;
 }
 
-export class BatchGetRow extends Basic {
-    public constructor(config: OperatorConfig) {
-        super(config);
+export class BatchGetRow {
+    public constructor(private readonly client: Client) {
     }
 
     public static async builder(options: BatchGetRowData) {
@@ -97,7 +95,7 @@ export class BatchGetRow extends Basic {
 
     public async do(data: BatchGetRowData) {
         const body = await BatchGetRow.builder(data);
-        return await this.request.do({
+        return await this.client.request.do({
             apiName: OTS_API_NAME.BatchGetRow,
             body,
         });

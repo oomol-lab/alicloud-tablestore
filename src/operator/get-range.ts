@@ -1,13 +1,12 @@
+import type { Client } from "../client";
 import type { ConsumedCapacity, Direction, Filter, TimeRange } from "../pb/type";
 import type { PlainBufferCell, PlainBufferRow } from "../plainbuffer";
-import type { OperatorConfig } from "../type";
 import { Buffer } from "node:buffer";
 import { buildFilter } from "../builder/filter";
 import { OTS_API_NAME } from "../const";
 import { builder } from "../pb/builder";
 import { decodePlainBuffer, encodePlainBuffer } from "../plainbuffer";
 import { fixPlainBufferCellType } from "../utils";
-import { Basic } from "./basic";
 
 export const ProtoGetRangeRequest = builder.lookupType("ots.GetRangeRequest");
 export const ProtoGetRangeResponse = builder.lookupType("ots.GetRangeResponse");
@@ -32,9 +31,8 @@ export interface GetRangeResponse {
     nextStartPrimaryKey: PlainBufferRow | null;
 }
 
-export class GetRange extends Basic {
-    public constructor(config: OperatorConfig) {
-        super(config);
+export class GetRange {
+    public constructor(private readonly client: Client) {
     }
 
     public static async builder(options: GetRangeData) {
@@ -88,7 +86,7 @@ export class GetRange extends Basic {
 
     public async do(data: GetRangeData) {
         const body = await GetRange.builder(data);
-        return await this.request.do({
+        return await this.client.request.do({
             apiName: OTS_API_NAME.GetRange,
             body,
         });

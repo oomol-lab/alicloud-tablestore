@@ -1,13 +1,12 @@
+import type { Client } from "../client";
 import type { ConsumedCapacity, Filter, TimeRange } from "../pb/type";
 import type { PlainBufferCell, PlainBufferRow } from "../plainbuffer";
-import type { OperatorConfig } from "../type";
 import { Buffer } from "node:buffer";
 import { buildFilter } from "../builder/filter";
 import { OTS_API_NAME } from "../const";
 import { builder } from "../pb/builder";
 import { decodePlainBuffer, encodePlainBuffer } from "../plainbuffer";
 import { fixPlainBufferCellType } from "../utils";
-import { Basic } from "./basic";
 
 export const ProtoGetRowRequest = builder.lookupType("ots.GetRowRequest");
 export const ProtoGetRowResponse = builder.lookupType("ots.GetRowResponse");
@@ -31,9 +30,8 @@ export interface GetRowResponse {
     nextToken: ArrayBuffer | null; // Tablestore currently not supported
 }
 
-export class GetRow extends Basic {
-    public constructor(config: OperatorConfig) {
-        super(config);
+export class GetRow {
+    public constructor(private readonly client: Client) {
     }
 
     public static async builder(options: GetRowData) {
@@ -82,7 +80,7 @@ export class GetRow extends Basic {
 
     public async do(data: GetRowData) {
         const body = await GetRow.builder(data);
-        return await this.request.do({
+        return await this.client.request.do({
             apiName: OTS_API_NAME.GetRow,
             body,
         });

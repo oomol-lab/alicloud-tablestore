@@ -1,4 +1,4 @@
-import type { OTSApiName, RequestConfig, RequestOptions } from "./type";
+import type { ClientConfig, OTSApiName, RequestOptions } from "./type";
 import { createHash, createHmac } from "node:crypto";
 import ky from "ky";
 import { API_VERSION, H_OTS_ACCESS_KEY_ID, H_OTS_API_VERSION, H_OTS_CONTENT_MD5, H_OTS_DATE, H_OTS_INSTANCE_NAME, H_OTS_PREFIX, H_OTS_SIGNATURE, USER_AGENT } from "./const";
@@ -9,7 +9,7 @@ const DEFAULT_REQUEST_OPTIONS = {
 };
 
 export class Request {
-    public constructor(private readonly config: RequestConfig) {
+    public constructor(private readonly config: ClientConfig) {
     }
 
     public async do(options: RequestOptions): Promise<Uint8Array> {

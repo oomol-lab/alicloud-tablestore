@@ -1,6 +1,6 @@
+import type { Client } from "../client";
 import type { Condition, ConsumedCapacity, ReturnContent } from "../pb/type";
 import type { PlainBufferCell, PlainBufferRow } from "../plainbuffer";
-import type { OperatorConfig } from "../type";
 import { Buffer } from "node:buffer";
 import { buildFilter } from "../builder/filter";
 import { OTS_API_NAME } from "../const";
@@ -8,7 +8,6 @@ import { builder } from "../pb/builder";
 import { RowExistenceExpectation } from "../pb/type";
 import { decodePlainBuffer, encodePlainBuffer } from "../plainbuffer";
 import { fixPlainBufferCellType } from "../utils";
-import { Basic } from "./basic";
 
 export const ProtoPutRowRequest = builder.lookupType("ots.PutRowRequest");
 export const ProtoPutRowResponse = builder.lookupType("ots.PutRowResponse");
@@ -26,9 +25,8 @@ export interface PutRowResponse {
     consumed: ConsumedCapacity;
     row: Array<PlainBufferRow> | null;
 }
-export class PutRow extends Basic {
-    public constructor(config: OperatorConfig) {
-        super(config);
+export class PutRow {
+    public constructor(private readonly client: Client) {
     }
 
     public static async builder(options: PutRowData) {
@@ -65,7 +63,7 @@ export class PutRow extends Basic {
 
     public async do(data: PutRowData) {
         const body = await PutRow.builder(data);
-        return await this.request.do({
+        return await this.client.request.do({
             apiName: OTS_API_NAME.PutRow,
             body,
         });

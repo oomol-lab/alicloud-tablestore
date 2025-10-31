@@ -1,6 +1,6 @@
 import type { OTS_API_NAME } from "./const";
 
-export interface RequestConfig {
+export interface ClientConfig {
     endpoint: string;
     accessKeyID: string;
     accessKeySecret: string;
@@ -11,14 +11,6 @@ export interface RequestOptions {
     apiName: OTSApiName;
     body: Uint8Array;
     headers?: Record<string, string>;
-}
-
-export interface RequestFactory {
-    do: (options: RequestOptions) => Promise<any>;
-}
-
-export interface OperatorConfig extends RequestConfig {
-    request?: RequestFactory;
 }
 
 export type OTSApiName = keyof typeof OTS_API_NAME;
