@@ -1,6 +1,6 @@
+import type { Client } from "../client";
 import type { Condition, ConsumedCapacity, ReturnContent } from "../pb/type";
 import type { PlainBufferCell, PlainBufferRow } from "../plainbuffer";
-import type { OperatorConfig } from "../type";
 import { Buffer } from "node:buffer";
 import { buildFilter } from "../builder/filter";
 import { OTS_API_NAME } from "../const";
@@ -8,7 +8,6 @@ import { builder } from "../pb/builder";
 import { RowExistenceExpectation } from "../pb/type";
 import { decodePlainBuffer, encodePlainBuffer } from "../plainbuffer";
 import { fixPlainBufferCellType } from "../utils";
-import { Basic } from "./basic";
 
 export const ProtoDeleteRowRequest = builder.lookupType("ots.DeleteRowRequest");
 export const ProtoDeleteRowResponse = builder.lookupType("ots.DeleteRowResponse");
@@ -26,9 +25,8 @@ export interface DeleteRowResponse {
     row: Array<PlainBufferRow> | null;
 }
 
-export class DeleteRow extends Basic {
-    public constructor(config: OperatorConfig) {
-        super(config);
+export class DeleteRow {
+    public constructor(private readonly client: Client) {
     }
 
     public static async builder(options: DeleteRowData) {
@@ -66,7 +64,7 @@ export class DeleteRow extends Basic {
 
     public async do(data: DeleteRowData) {
         const body = await DeleteRow.builder(data);
-        return await this.request.do({
+        return await this.client.request.do({
             apiName: OTS_API_NAME.DeleteRow,
             body,
         });

@@ -1,8 +1,10 @@
 export {
+    Client,
+} from "./client";
+
+export {
     OTS_API_NAME,
 } from "./const";
-
-export { Basic } from "./operator/basic";
 
 export {
     BatchGetRow,
@@ -86,6 +88,7 @@ export {
     type Filter,
     FilterType,
     type LogicalOperator,
+    OperationType,
     type ReturnContent,
     ReturnType,
     RowExistenceExpectation,
@@ -109,9 +112,7 @@ export {
 export { Request } from "./request";
 
 export {
-    type OperatorConfig,
+    type ClientConfig,
     type OTSApiName,
-    type RequestConfig,
-    type RequestFactory,
     type RequestOptions,
 } from "./type";
