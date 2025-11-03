@@ -72,7 +72,7 @@ export class GetRow {
         }
 
         if (!options.maxVersions && !options.timeRange) {
-            options.maxVersions = 1;
+            payload.maxVersions = 1;
         }
 
         return ProtoGetRowRequest.encode(ProtoGetRowRequest.create(payload)).finish();
