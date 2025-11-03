@@ -83,7 +83,7 @@ export class BatchGetRow {
                 }
 
                 if (!table.maxVersions && !table.timeRange) {
-                    table.maxVersions = 1;
+                    p.maxVersions = 1;
                 }
 
                 return p;
