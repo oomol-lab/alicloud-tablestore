@@ -116,3 +116,9 @@ export {
     type OTSApiName,
     type RequestOptions,
 } from "./type";
+
+export {
+    createAttribute,
+    createPrimaryKey,
+    fixPlainBufferCellType,
+} from "./utils";
