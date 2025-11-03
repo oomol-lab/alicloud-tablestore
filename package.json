@@ -23,6 +23,10 @@
       "types": "./dist/request.d.mts",
       "import": "./dist/request.mjs"
     },
+    "./client": {
+      "types": "./dist/client.d.mts",
+      "import": "./dist/client.mjs"
+    },
     "./pb/*": {
       "types": "./dist/pb/*.d.mts",
       "import": "./dist/pb/*.mjs"
