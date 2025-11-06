@@ -22,3 +22,6 @@ export const OTS_API_NAME = {
     BatchGetRow: "BatchGetRow",
     BatchWriteRow: "BatchWriteRow",
 } as const;
+
+export const INF_MIN = {};
+export const INF_MAX = {};

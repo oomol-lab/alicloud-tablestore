@@ -18,8 +18,8 @@ export interface GetRangeData {
     timeRange?: TimeRange;
     maxVersions?: number;
     limit?: number;
-    inclusiveStartPrimaryKey: PlainBufferCell;
-    exclusiveEndPrimaryKey: PlainBufferCell;
+    inclusiveStartPrimaryKey: PlainBufferCell[];
+    exclusiveEndPrimaryKey: PlainBufferCell[];
     filter?: Filter;
     startColumn?: string;
     endColumn?: string;
@@ -40,11 +40,11 @@ export class GetRange {
             tableName: options.tableName,
             direction: options.direction,
             inclusiveStartPrimaryKey: Buffer.from(encodePlainBuffer([{
-                primaryKey: [fixPlainBufferCellType(options.inclusiveStartPrimaryKey)],
+                primaryKey: options.inclusiveStartPrimaryKey.map(fixPlainBufferCellType),
                 attributes: [],
             }])),
             exclusiveEndPrimaryKey: Buffer.from(encodePlainBuffer([{
-                primaryKey: [fixPlainBufferCellType(options.exclusiveEndPrimaryKey)],
+                primaryKey: options.exclusiveEndPrimaryKey.map(fixPlainBufferCellType),
                 attributes: [],
             }])),
         };
