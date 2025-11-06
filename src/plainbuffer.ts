@@ -1,5 +1,3 @@
-import { INF_MAX, INF_MIN } from "./const";
-
 // FROM: https://github.com/waynecraig/plainbuffer
 const HEADER = 0x75;
 

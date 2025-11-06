@@ -5,7 +5,7 @@ import { Buffer } from "node:buffer";
 import { buildFilter } from "../builder/filter";
 import { OTS_API_NAME } from "../const";
 import { builder } from "../pb/builder";
-import { decodePlainBuffer, encodePlainBuffer, VariantType } from "../plainbuffer";
+import { decodePlainBuffer, encodePlainBuffer } from "../plainbuffer";
 import { fixPlainBufferCellType } from "../utils";
 
 export const ProtoGetRangeRequest = builder.lookupType("ots.GetRangeRequest");
