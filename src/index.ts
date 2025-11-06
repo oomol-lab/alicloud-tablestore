@@ -3,6 +3,8 @@ export {
 } from "./client";
 
 export {
+    INF_MAX,
+    INF_MIN,
     OTS_API_NAME,
 } from "./const";
 

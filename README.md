@@ -193,14 +193,20 @@ const result = await batchWriteRow.do({
 Query rows within a range of primary keys.
 
 ```typescript
-import { GetRange, Direction } from "alicloud-tablestore";
+import { GetRange, Direction, INF_MIN, INF_MAX } from "alicloud-tablestore";
 
 const getRange = new GetRange(client);
 const result = await getRange.do({
   tableName: "users",
   direction: Direction.FORWARD, // or Direction.BACKWARD
-  inclusiveStartPrimaryKey: createPrimaryKey("id", "100"),
-  exclusiveEndPrimaryKey: createPrimaryKey("id", "200"),
+  inclusiveStartPrimaryKey: [
+    createPrimaryKey("id", "100")
+    createPrimaryKey("age", INF_MIN),
+  ],
+  exclusiveEndPrimaryKey: [
+    createPrimaryKey("id", "200"),
+    createPrimaryKey("age", INF_MAX),
+  ],
   limit: 100,
   maxVersions: 1,
 });
