@@ -200,7 +200,7 @@ const result = await getRange.do({
   tableName: "users",
   direction: Direction.FORWARD, // or Direction.BACKWARD
   inclusiveStartPrimaryKey: [
-    createPrimaryKey("id", "100")
+    createPrimaryKey("id", "100"),
     createPrimaryKey("age", INF_MIN),
   ],
   exclusiveEndPrimaryKey: [
