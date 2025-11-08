@@ -28,7 +28,7 @@ export interface GetRangeData {
 export interface GetRangeResponse {
     consumed: ConsumedCapacity;
     rows: Array<PlainBufferRow> | null;
-    nextStartPrimaryKey: PlainBufferRow | null;
+    nextStartPrimaryKey: Array<PlainBufferRow> | null;
 }
 
 export class GetRange {
