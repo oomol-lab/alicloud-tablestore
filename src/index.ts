@@ -1,4 +1,18 @@
 export {
+    buildColumnPaginationFilter,
+    buildCompositeColumnValueFilter,
+    buildFilter,
+    buildSingleColumnValueFilter,
+    columnPaginationFilter,
+    compositeCondition,
+    ProtoColumnPaginationFilter,
+    ProtoCompositeColumnValueFilter,
+    ProtoFilter,
+    ProtoSingleColumnValueFilter,
+    singleColumnCondition,
+} from "./builder/filter";
+
+export {
     Client,
 } from "./client";
 
