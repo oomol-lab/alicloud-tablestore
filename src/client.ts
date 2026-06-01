@@ -1,4 +1,4 @@
-import type { ClientConfig } from "./type";
+import type { ClientConfig, CredentialProvider } from "./type";
 import { Request } from "./request";
 
 export class Client {
@@ -9,10 +9,20 @@ export class Client {
 
     public updateCredentials(accessKeyID: string, accessKeySecret: string, stsToken?: string) {
         this.config = {
-            ...this.config,
             accessKeyID,
             accessKeySecret,
+            endpoint: this.config.endpoint,
+            instanceName: this.config.instanceName,
             stsToken,
+        };
+        this.request = new Request(this.config);
+    }
+
+    public updateCredentialProvider(credentialProvider: CredentialProvider) {
+        this.config = {
+            credentialProvider,
+            endpoint: this.config.endpoint,
+            instanceName: this.config.instanceName,
         };
         this.request = new Request(this.config);
     }

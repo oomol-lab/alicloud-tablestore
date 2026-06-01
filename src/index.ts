@@ -23,6 +23,13 @@ export {
 } from "./const";
 
 export {
+    createOIDCCredentialProvider,
+    createOIDCCredentialProviderFromEnv,
+    OIDCCredentialProvider,
+    type OIDCCredentialProviderConfig,
+} from "./credentials";
+
+export {
     BatchGetRow,
     type BatchGetRowData,
     type BatchGetRowResponse,
@@ -129,8 +136,12 @@ export { Request } from "./request";
 
 export {
     type ClientConfig,
+    type CredentialProvider,
+    type Credentials,
     type OTSApiName,
+    type ProviderClientConfig,
     type RequestOptions,
+    type StaticClientConfig,
 } from "./type";
 
 export {

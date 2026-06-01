@@ -27,6 +27,10 @@
       "types": "./dist/client.d.mts",
       "import": "./dist/client.mjs"
     },
+    "./credentials": {
+      "types": "./dist/credentials.d.mts",
+      "import": "./dist/credentials.mjs"
+    },
     "./utils": {
       "types": "./dist/utils.d.mts",
       "import": "./dist/utils.mjs"
@@ -53,6 +57,7 @@
     "build": "tsdown",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "test": "bun test",
     "ts:check": "tsc --noEmit"
   },
   "peerDependencies": {

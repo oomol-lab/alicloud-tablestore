@@ -1,4 +1,4 @@
-import type { ClientConfig, OTSApiName, RequestOptions } from "./type";
+import type { ClientConfig, Credentials, OTSApiName, RequestOptions } from "./type";
 import { createHash, createHmac } from "node:crypto";
 import ky from "ky";
 import { API_VERSION, H_OTS_ACCESS_KEY_ID, H_OTS_API_VERSION, H_OTS_CONTENT_MD5, H_OTS_DATE, H_OTS_INSTANCE_NAME, H_OTS_PREFIX, H_OTS_SIGNATURE, H_OTS_STS_TOKEN, USER_AGENT } from "./const";
@@ -13,19 +13,20 @@ export class Request {
     }
 
     public async do(options: RequestOptions): Promise<Uint8Array> {
+        const credentials = await this.getCredentials();
         const headers: Record<string, string> = Object.assign({
-            [H_OTS_ACCESS_KEY_ID]: this.config.accessKeyID,
+            [H_OTS_ACCESS_KEY_ID]: credentials.accessKeyID,
             [H_OTS_API_VERSION]: API_VERSION,
             [H_OTS_CONTENT_MD5]: createHash("md5").update(options.body).digest("base64"),
             [H_OTS_DATE]: new Date().toISOString(),
             [H_OTS_INSTANCE_NAME]: this.config.instanceName,
         }, options.headers);
 
-        if (this.config.stsToken) {
-            headers[H_OTS_STS_TOKEN] = this.config.stsToken;
+        if (credentials.stsToken) {
+            headers[H_OTS_STS_TOKEN] = credentials.stsToken;
         }
 
-        headers[H_OTS_SIGNATURE] = this.sign(options.apiName, headers);
+        headers[H_OTS_SIGNATURE] = this.sign(options.apiName, headers, credentials.accessKeySecret);
         headers["User-Agent"] = USER_AGENT;
 
         const url = `http://${this.config.endpoint}/${options.apiName}`;
@@ -46,12 +47,24 @@ export class Request {
         return await response.bytes();
     }
 
-    private sign(apiName: OTSApiName, headers: Record<string, string>): string {
+    private async getCredentials(): Promise<Credentials> {
+        if (this.config.credentialProvider) {
+            return await this.config.credentialProvider();
+        }
+
+        return {
+            accessKeyID: this.config.accessKeyID,
+            accessKeySecret: this.config.accessKeySecret,
+            stsToken: this.config.stsToken,
+        };
+    }
+
+    private sign(apiName: OTSApiName, headers: Record<string, string>, accessKeySecret: string): string {
         const canonicalizedHeaders = getCanonicalizedHeaders(headers);
 
         const signString = `/${apiName}\nPOST\n\n${canonicalizedHeaders}\n`;
 
-        const signature = createHmac("sha1", this.config.accessKeySecret).update(signString).digest("base64");
+        const signature = createHmac("sha1", accessKeySecret).update(signString).digest("base64");
         return signature;
     }
 }

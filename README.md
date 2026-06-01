@@ -50,6 +50,38 @@ const getResult = await getRow.do({
 console.log(GetRow.response(getResult));
 ```
 
+### OIDC Credentials
+
+For long-running workloads, use an OIDC credential provider instead of passing one STS token at startup. The provider calls `AssumeRoleWithOIDC`, caches the returned STS credentials, and refreshes them before expiration.
+
+```typescript
+import { Client, createOIDCCredentialProviderFromEnv } from "alicloud-tablestore";
+
+const client = new Client({
+  endpoint: "your-instance.cn-hangzhou.ots.aliyuncs.com",
+  instanceName: "your-instance",
+  credentialProvider: createOIDCCredentialProviderFromEnv(),
+});
+```
+
+`createOIDCCredentialProviderFromEnv()` reads `ALIBABA_CLOUD_ROLE_ARN`, `ALIBABA_CLOUD_OIDC_PROVIDER_ARN`, and `ALIBABA_CLOUD_OIDC_TOKEN_FILE`. You can also pass explicit values:
+
+```typescript
+import { Client, createOIDCCredentialProvider } from "alicloud-tablestore";
+
+const client = new Client({
+  endpoint: "your-instance.cn-hangzhou.ots.aliyuncs.com",
+  instanceName: "your-instance",
+  credentialProvider: createOIDCCredentialProvider({
+    roleArn: "acs:ram::1234567890123456:role/example",
+    oidcProviderArn: "acs:ram::1234567890123456:oidc-provider/example",
+    oidcTokenFilePath: "/var/run/secrets/ack.alibabacloud.com/rrsa-tokens/token",
+    roleSessionName: "tablestore-worker",
+    refreshBeforeExpirationSeconds: 300,
+  }),
+});
+```
+
 ## API Reference
 
 All operators follow the same pattern: `new Operator(client)` → `operator.do(data)` → `Operator.response(result)`
