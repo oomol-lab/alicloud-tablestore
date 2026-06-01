@@ -57,6 +57,7 @@
     "build": "tsdown",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "test": "bun test",
     "ts:check": "tsc --noEmit"
   },
   "peerDependencies": {
