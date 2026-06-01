@@ -1,4 +1,5 @@
 import type { CredentialProvider, Credentials } from "./type";
+import { randomUUID } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import process from "node:process";
 import ky from "ky";
@@ -85,6 +86,8 @@ export class OIDCCredentialProvider {
             OIDCToken: oidcToken,
             RoleArn: this.config.roleArn,
             RoleSessionName: this.config.roleSessionName ?? DEFAULT_ROLE_SESSION_NAME,
+            SignatureNonce: randomUUID(),
+            Timestamp: createSTSTimestamp(),
             Version: "2015-04-01",
         });
 
@@ -224,6 +227,10 @@ function getSTSEndpointURL(endpoint = DEFAULT_STS_ENDPOINT): string {
     }
 
     return url.toString();
+}
+
+function createSTSTimestamp(): string {
+    return new Date().toISOString().replace(/\.\d{3}Z$/, "Z");
 }
 
 function formatSTSError(status: number, statusText: string, data: AssumeRoleWithOIDCResponse): string {
