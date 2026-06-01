@@ -46,6 +46,8 @@ describe("OIDC credential provider", () => {
             expect(requests[0]!.get("OIDCProviderArn")).toBe("acs:ram::1234567890123456:oidc-provider/example");
             expect(requests[0]!.get("RoleSessionName")).toBe("tablestore-test");
             expect(requests[0]!.get("DurationSeconds")).toBe("900");
+            expect(requests[0]!.get("Timestamp")).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/);
+            expect(requests[0]!.get("SignatureNonce")).toMatch(/^[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}$/);
         }
         finally {
             restoreFetch();
