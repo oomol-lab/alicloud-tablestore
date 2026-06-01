@@ -4,8 +4,10 @@ import { createOIDCCredentialProvider } from "../src/credentials";
 describe("OIDC credential provider", () => {
     test("exchanges an OIDC token for STS credentials", async () => {
         const requests: URLSearchParams[] = [];
-        const restoreFetch = mockSTSFetch((params) => {
+        const urls: string[] = [];
+        const restoreFetch = mockSTSFetch((params, request) => {
             requests.push(params);
+            urls.push(request.url);
             return createSTSResponse({
                 accessKeyID: "access-key-id",
                 accessKeySecret: "access-key-secret",
@@ -24,7 +26,7 @@ describe("OIDC credential provider", () => {
                 }),
                 roleArn: "acs:ram::1234567890123456:role/example",
                 roleSessionName: "tablestore-test",
-                stsEndpoint: "https://sts.example.com",
+                stsEndpoint: "https://sts.example.com?source=test",
             });
 
             const credentials = await credentialProvider();
@@ -36,6 +38,7 @@ describe("OIDC credential provider", () => {
                 stsToken: "security-token",
             });
             expect(requests).toHaveLength(1);
+            expect(urls).toEqual(["https://sts.example.com/?source=test"]);
             expect(requests[0]!.get("Action")).toBe("AssumeRoleWithOIDC");
             expect(requests[0]!.get("Version")).toBe("2015-04-01");
             expect(requests[0]!.get("OIDCToken")).toBe("oidc-token");
@@ -150,11 +153,13 @@ describe("OIDC credential provider", () => {
 
             const first = await credentialProvider();
             const fallback = await credentialProvider();
+            const backedOff = await credentialProvider();
 
             expect(hits).toBe(2);
             expect(first.accessKeyID).toBe("access-key-id");
             expect(fallback.accessKeyID).toBe("access-key-id");
             expect(fallback.stsToken).toBe("security-token");
+            expect(backedOff.accessKeyID).toBe("access-key-id");
         }
         finally {
             restoreFetch();
@@ -169,12 +174,12 @@ interface STSResponseOptions {
     stsToken: string;
 }
 
-function mockSTSFetch(handler: (params: URLSearchParams) => unknown | Promise<unknown>): () => void {
+function mockSTSFetch(handler: (params: URLSearchParams, request: Request) => unknown | Promise<unknown>): () => void {
     const originalFetch = globalThis.fetch;
     globalThis.fetch = (async (input, init) => {
         const request = input instanceof Request ? input : new Request(String(input), init);
         const params = new URLSearchParams(await request.text());
-        return Response.json(await handler(params));
+        return Response.json(await handler(params, request));
     }) as typeof fetch;
 
     return () => {

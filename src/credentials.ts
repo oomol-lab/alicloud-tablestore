@@ -5,6 +5,7 @@ import ky from "ky";
 
 const DEFAULT_STS_ENDPOINT = "sts.aliyuncs.com";
 const DEFAULT_REFRESH_BEFORE_EXPIRATION_SECONDS = 300;
+const DEFAULT_REFRESH_FAILURE_BACKOFF_SECONDS = 60;
 const DEFAULT_REQUEST_TIMEOUT = 30000;
 const DEFAULT_ROLE_SESSION_NAME = "alicloud-tablestore";
 
@@ -18,6 +19,7 @@ export interface OIDCCredentialProviderConfig {
     durationSeconds?: number;
     stsEndpoint?: string;
     refreshBeforeExpirationSeconds?: number;
+    refreshFailureBackoffSeconds?: number;
     requestTimeout?: number;
 }
 
@@ -39,6 +41,7 @@ interface OIDCCredentials extends Credentials {
 
 export class OIDCCredentialProvider {
     private credentials: OIDCCredentials | null = null;
+    private refreshBlockedUntil = 0;
     private refreshPromise: Promise<Credentials> | null = null;
 
     public constructor(private readonly config: OIDCCredentialProviderConfig) {
@@ -46,6 +49,10 @@ export class OIDCCredentialProvider {
 
     public async getCredentials(): Promise<Credentials> {
         if (this.credentials && !this.shouldRefresh(this.credentials)) {
+            return this.credentials;
+        }
+
+        if (this.credentials && !this.isExpired(this.credentials) && this.refreshBlockedUntil > Date.now()) {
             return this.credentials;
         }
 
@@ -58,6 +65,7 @@ export class OIDCCredentialProvider {
         }
         catch (error) {
             if (this.credentials && !this.isExpired(this.credentials)) {
+                this.refreshBlockedUntil = Date.now() + this.getRefreshFailureBackoffMilliseconds();
                 return this.credentials;
             }
 
@@ -121,6 +129,7 @@ export class OIDCCredentialProvider {
             expiration,
             stsToken: credentials.SecurityToken,
         };
+        this.refreshBlockedUntil = 0;
 
         return this.credentials;
     }
@@ -147,6 +156,13 @@ export class OIDCCredentialProvider {
 
     private isExpired(credentials: OIDCCredentials): boolean {
         return credentials.expiration.getTime() <= Date.now();
+    }
+
+    private getRefreshFailureBackoffMilliseconds(): number {
+        return Math.max(
+            0,
+            this.config.refreshFailureBackoffSeconds ?? DEFAULT_REFRESH_FAILURE_BACKOFF_SECONDS,
+        ) * 1000;
     }
 }
 
@@ -199,11 +215,15 @@ function parseSTSResponse(text: string): AssumeRoleWithOIDCResponse {
 }
 
 function getSTSEndpointURL(endpoint = DEFAULT_STS_ENDPOINT): string {
-    if (endpoint.startsWith("http://") || endpoint.startsWith("https://")) {
-        return endpoint.endsWith("/") ? endpoint : `${endpoint}/`;
+    const url = new URL(endpoint.startsWith("http://") || endpoint.startsWith("https://")
+        ? endpoint
+        : `https://${endpoint}`);
+
+    if (!url.pathname.endsWith("/")) {
+        url.pathname = `${url.pathname}/`;
     }
 
-    return `https://${endpoint}/`;
+    return url.toString();
 }
 
 function formatSTSError(status: number, statusText: string, data: AssumeRoleWithOIDCResponse): string {
