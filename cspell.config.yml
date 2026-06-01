@@ -10,3 +10,5 @@ words:
   - plainbuffer
   - alicloud
   - ststoken
+  - oidc
+  - oidctoken
