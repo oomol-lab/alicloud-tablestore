@@ -56,6 +56,13 @@ export class OIDCCredentialProvider {
         try {
             return await this.refreshPromise;
         }
+        catch (error) {
+            if (this.credentials && !this.isExpired(this.credentials)) {
+                return this.credentials;
+            }
+
+            throw error;
+        }
         finally {
             this.refreshPromise = null;
         }
@@ -136,6 +143,10 @@ export class OIDCCredentialProvider {
             this.config.refreshBeforeExpirationSeconds ?? DEFAULT_REFRESH_BEFORE_EXPIRATION_SECONDS,
         );
         return credentials.expiration.getTime() - Date.now() <= refreshBeforeExpirationSeconds * 1000;
+    }
+
+    private isExpired(credentials: OIDCCredentials): boolean {
+        return credentials.expiration.getTime() <= Date.now();
     }
 }
 

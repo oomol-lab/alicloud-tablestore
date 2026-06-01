@@ -122,6 +122,44 @@ describe("OIDC credential provider", () => {
             restoreFetch();
         }
     });
+
+    test("keeps using unexpired credentials when refresh fails", async () => {
+        let hits = 0;
+        const restoreFetch = mockSTSFetch(() => {
+            hits += 1;
+            if (hits === 2) {
+                throw new Error("temporary STS failure");
+            }
+
+            return createSTSResponse({
+                accessKeyID: "access-key-id",
+                accessKeySecret: "access-key-secret",
+                expiration: new Date(Date.now() + 1000),
+                stsToken: "security-token",
+            });
+        });
+
+        try {
+            const credentialProvider = createOIDCCredentialProvider({
+                oidcProviderArn: "provider",
+                oidcToken: "oidc-token",
+                refreshBeforeExpirationSeconds: 300,
+                roleArn: "role",
+                stsEndpoint: "https://sts.example.com",
+            });
+
+            const first = await credentialProvider();
+            const fallback = await credentialProvider();
+
+            expect(hits).toBe(2);
+            expect(first.accessKeyID).toBe("access-key-id");
+            expect(fallback.accessKeyID).toBe("access-key-id");
+            expect(fallback.stsToken).toBe("security-token");
+        }
+        finally {
+            restoreFetch();
+        }
+    });
 });
 
 interface STSResponseOptions {
